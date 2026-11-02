@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel Administrador - Ms Store</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; background-color: #0c0c0c; color: #f1f1f1; }
+        header { background: #000; color: #d4af37; padding: 20px 30px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #d4af37; }
+        header h1 { margin: 0; font-size: 1.8rem; color: #d4af37; }
+        .back-btn { background: #262626; color: #d4af37; border: 1px solid #d4af37; padding: 8px 15px; border-radius: 4px; text-decoration: none; font-weight: bold; }
+        .back-btn:hover { background: #d4af37; color: #000; }
+        
+        .container { max-width: 1000px; margin: 40px auto; padding: 0 20px; }
+        .form-box { background: #161616; border: 1px solid #2a2a2a; padding: 30px; border-radius: 8px; margin-bottom: 40px; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
+        h2 { color: #d4af37; margin-top: 0; border-bottom: 2px solid #222; padding-bottom: 10px; }
+        
+        form { display: flex; flex-direction: column; gap: 15px; }
+        label { font-weight: bold; color: #d4af37; font-size: 0.9rem; }
+        input, textarea, select { background: #0c0c0c; color: #fff; border: 1px solid #333; padding: 10px; border-radius: 4px; font-size: 1rem; outline: none; }
+        input:focus, textarea:focus, select:focus { border-color: #d4af37; }
+        button { background: #d4af37; color: #000; border: none; padding: 12px; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 1rem; transition: 0.2s; }
+        button:hover { background: #c5a059; }
+
+        table { width: 100%; border-collapse: collapse; background: #161616; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
+        th, td { padding: 15px; text-align: left; border-bottom: 1px solid #2a2a2a; }
+        th { background: #202020; color: #d4af37; }
+        img { width: 50px; height: 50px; object-fit: cover; border-radius: 4px; vertical-align: middle; margin-right: 10px; }
+        .btn-delete { background: #ff4d4d; color: #fff; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-weight: bold; }
+        .btn-delete:hover { background: #cc0000; }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Ms Store - Panel de Administración</h1>
+        <a href="/" class="back-btn">← Ir a la Tienda</a>
+    </header>
+
+    <div class="container">
+        <div class="form-box">
+            <h2>Agregar Nuevo Producto</h2>
+            <form action="/agregar" method="POST" enctype="multipart/form-data">
+                <label for="nombre">Nombre del Producto:</label>
+                <input type="text" id="nombre" name="nombre" required>
+
+                <label for="precio">Precio ($ CLP):</label>
+                <input type="number" id="precio" name="precio" required>
+
+                <label for="categoria">Categoría:</label>
+                <select id="categoria" name="categoria" required>
+                    <option value="Poleras">Poleras</option>
+                    <option value="Cinturones">Cinturones</option>
+                    <option value="Perfumes">Perfumes</option>
+                    <option value="Accesorios">Accesorios</option>
+                    <option value="Otros">Otros</option>
+                </select>
+
+                <label for="descripcion">Descripción:</label>
+                <textarea id="descripcion" name="descripcion" rows="3"></textarea>
+
+                <label for="imagen">Imagen del Producto:</label>
+                <input type="file" id="imagen" name="imagen" accept="image/*">
+
+                <button type="submit">Guardar Producto</button>
+            </form>
+        </div>
+
+        <h2>Productos Registrados</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Producto</th>
+                    <th>Categoría</th>
+                    <th>Precio</th>
+                    <th>Ventas Totales</th>
+                    <th>Insignia Actual</th>
+                    <th>Acción</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for p in productos %}
+                <tr>
+                    <td>
+                        {% if p[4] %}
+                            <img src="{{ url_for('static', filename='uploads/' + p[4]) }}" alt="">
+                        {% endif %}
+                        {{ p[1] }}
+                    </td>
+                    <td>{{ p[5] if p[5] else 'Otros' }}</td>
+                    <td>${{ "{:,.0f}".format(p[2]) }}</td>
+                    <td style="font-weight: bold; color: #fff;">{{ p[6] if p[6] is not none else 0 }} ventas</td>
+                    <td style="color: #d4af37; font-weight: bold;">{{ p[7] if p[7] else '-' }}</td>
+                    <td>
+                        <form action="/eliminar/{{ p[0] }}" method="POST">
+                            <button type="submit" class="btn-delete">Eliminar</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</body>
+</html> 

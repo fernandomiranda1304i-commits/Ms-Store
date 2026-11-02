@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkout - Ms Store</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; background-color: #0c0c0c; color: #f1f1f1; }
+        header { background: #000; color: #d4af37; padding: 20px 30px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #d4af37; }
+        header h1 { margin: 0; font-size: 1.8rem; color: #d4af37; }
+        .back-btn { background: #262626; color: #d4af37; border: 1px solid #d4af37; padding: 8px 15px; border-radius: 4px; text-decoration: none; font-weight: bold; }
+        .back-btn:hover { background: #d4af37; color: #000; }
+        
+        .container { max-width: 850px; margin: 40px auto; padding: 0 20px; }
+        .box { background: #161616; border: 1px solid #2a2a2a; border-radius: 8px; padding: 30px; box-shadow: 0 4px 15px rgba(0,0,0,0.5); margin-bottom: 25px; }
+        h2 { color: #d4af37; margin-top: 0; border-bottom: 2px solid #222; padding-bottom: 10px; }
+        
+        ul { list-style: none; padding: 0; margin-bottom: 20px; }
+        li { padding: 10px 0; border-bottom: 1px solid #222; display: flex; justify-content: space-between; color: #ccc; }
+        .total-final { font-size: 1.4rem; font-weight: bold; color: #d4af37; text-align: right; margin-bottom: 25px; border-top: 1px solid #333; padding-top: 15px; }
+
+        /* Opciones de Pago */
+        .payment-methods { display: flex; flex-direction: column; gap: 15px; margin-top: 20px; }
+        .method-card { background: #0c0c0c; border: 1px solid #333; border-radius: 6px; padding: 18px; cursor: pointer; transition: 0.2s; }
+        .method-card:hover { border-color: #d4af37; }
+        .method-header { display: flex; align-items: center; gap: 12px; font-size: 1.1rem; font-weight: bold; color: #fff; }
+        .method-header input[type="radio"] { accent-color: #d4af37; width: 18px; height: 18px; cursor: pointer; }
+        
+        .method-details { display: none; margin-top: 15px; padding-top: 15px; border-top: 1px solid #222; color: #bbb; font-size: 0.95rem; line-height: 1.6; }
+        .method-details.active { display: block; }
+        
+        .bank-info { background: #1a1a1a; border: 1px solid #d4af37; border-radius: 6px; padding: 15px; margin-top: 10px; }
+        .bank-info p { margin: 5px 0; font-size: 0.95rem; }
+        .bank-info strong { color: #d4af37; }
+
+        /* Botones */
+        .btn-wa { display: block; width: 100%; background: #25d366; color: #fff; text-align: center; padding: 14px; border-radius: 6px; font-weight: bold; font-size: 1.1rem; text-decoration: none; box-sizing: border-box; transition: 0.2s; margin-top: 15px; }
+        .btn-wa:hover { background: #20ba5a; }
+        
+        .btn-mp { display: block; width: 100%; background: #009ee3; color: #fff; text-align: center; padding: 14px; border-radius: 6px; font-weight: bold; font-size: 1.1rem; text-decoration: none; box-sizing: border-box; transition: 0.2s; margin-top: 15px; }
+        .btn-mp:hover { background: #008ac7; }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Ms Store - Finalizar Compra</h1>
+        <a href="/carrito" class="back-btn">← Volver al Carrito</a>
+    </header>
+
+    <div class="container">
+        <!-- Resumen del Pedido -->
+        <div class="box">
+            <h2>Resumen de tu Pedido</h2>
+            <ul>
+                {% for p in productos %}
+                <li class="item-checkout" data-nombre="{{ p[1] }}" data-precio="{{ p[2] }}">
+                    <span>{{ p[1] }}</span>
+                    <span style="color:#d4af37; font-weight:bold;">${{ "{:,.0f}".format(p[2]) }}</span>
+                </li>
+                {% endfor %}
+            </ul>
+
+            <div class="total-final" id="total-checkout" data-total="${{ '{:,.0f}'.format(total) }}">
+                Total a Pagar: ${{ "{:,.0f}".format(total) }}
+            </div>
+        </div>
+
+        <!-- Selección de Métodos de Pago -->
+        <div class="box">
+            <h2>Selecciona tu Método de Pago</h2>
+            
+            <div class="payment-methods">
+                
+                <!-- Opción 1: Mercado Pago (Link de Pago) -->
+                <div class="method-card" onclick="selectMethod('mp')">
+                    <div class="method-header">
+                        <input type="radio" name="pago" id="radio-mp" checked>
+                        <label for="radio-mp">🟦 Mercado Pago (Tarjetas / Dinero en cuenta)</label>
+                    </div>
+                    <div class="method-details active" id="details-mp">
+                        <p>Paga con cualquier tarjeta de débito o crédito de forma segura a través de nuestro enlace de pago oficial.</p>
+                        <!-- REEMPLAZA EL '#' POR TU LINK DE PAGO CREADO EN MERCADO PAGO -->
+                        <a href="https://link.mercadopago.cl/msstore77" target="_blank" class="btn-mp">🟦 Pagar con Mercado Pago</a>
+                    </div>
+                </div>
+
+                <!-- Opción 2: Transferencia BancoEstado -->
+                <div class="method-card" onclick="selectMethod('transferencia')">
+                    <div class="method-header">
+                        <input type="radio" name="pago" id="radio-transf">
+                        <label for="radio-transf">🏦 Transferencia Bancaria (BancoEstado / CuentaRUT)</label>
+                    </div>
+                    <div class="method-details" id="details-transferencia">
+                        <p>Realiza la transferencia a nuestros datos y luego envía el comprobante directamente por WhatsApp:</p>
+                        
+                        <div class="bank-info">
+                            <p><strong>Banco:</strong> BancoEstado</p>
+                            <p><strong>Tipo de Cuenta:</strong> CuentaRUT</p>
+                            <p><strong>RUT:</strong> 21.964.589-9</p>
+                            <p><strong>Correo/Email:</strong> matias.79sepulveda@gmail.com </p>
+                        </div>
+
+                        <a href="#" id="whatsapp-checkout-btn" class="btn-wa" target="_blank">📲 Adjuntar Comprobante por WhatsApp</a>
+                    </div>
+                </div>
+
+                <!-- Opción 3: Pedido Rápido por WhatsApp -->
+                <div class="method-card" onclick="selectMethod('wa')">
+                    <div class="method-header">
+                        <input type="radio" name="pago" id="radio-wa">
+                        <label for="radio-wa">💬 Pedido y Coordinación Directa por WhatsApp</label>
+                    </div>
+                    <div class="method-details" id="details-wa">
+                        <p>Envíanos los detalles de tu compra directamente a WhatsApp para coordinar el pago y entrega.</p>
+                        <a href="#" id="whatsapp-directo-btn" class="btn-wa" target="_blank">📲 Enviar Pedido por WhatsApp</a>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function selectMethod(method) {
+            document.getElementById('radio-mp').checked = (method === 'mp');
+            document.getElementById('radio-transf').checked = (method === 'transferencia');
+            document.getElementById('radio-wa').checked = (method === 'wa');
+
+            document.getElementById('details-mp').classList.toggle('active', method === 'mp');
+            document.getElementById('details-transferencia').classList.toggle('active', method === 'transferencia');
+            document.getElementById('details-wa').classList.toggle('active', method === 'wa');
+        }
+
+        const numeroWhatsApp = "56955104794"; // Reemplaza por tu número real
+        const items = document.querySelectorAll('.item-checkout');
+        const totalText = document.getElementById('total-checkout').getAttribute('data-total');
+
+        let mensajeLineas = [];
+        items.forEach(item => {
+            const nombre = item.getAttribute('data-nombre');
+            const precio = item.getAttribute('data-precio');
+            mensajeLineas.push(`- ${nombre} ($${precio})`);
+        });
+
+        const textoTransf = `Hola! Realicé una transferencia bancaria para el siguiente pedido en Ms Store:\n` +
+                             mensajeLineas.join('\n') +
+                             `\n\n*Total pagado:* ${totalText}\nAquí adjunto mi comprobante:`;
+
+        const textoWA = `Hola! Vengo a realizar el siguiente pedido en Ms Store:\n` +
+                        mensajeLineas.join('\n') +
+                        `\n\n*Total a pagar:* ${totalText}`;
+
+        document.getElementById('whatsapp-checkout-btn').href = `https://wa.me/${numeroWhatsApp}?text=${encodeURIComponent(textoTransf)}`;
+        document.getElementById('whatsapp-directo-btn').href = `https://wa.me/${numeroWhatsApp}?text=${encodeURIComponent(textoWA)}`;
+    </script>
+</body>
+</html> 

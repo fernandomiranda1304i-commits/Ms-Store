@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ms Store - Tienda Oficial</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; background-color: #0c0c0c; color: #f1f1f1; display: flex; flex-direction: column; min-height: 100vh; }
+        header { background: #000; color: #d4af37; padding: 20px 30px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #d4af37; }
+        .logo-area { display: flex; align-items: center; gap: 15px; }
+        header img { height: 50px; object-fit: contain; border-radius: 50%; border: 1px solid #d4af37; }
+        header h1 { margin: 0; font-size: 1.8rem; letter-spacing: 1px; color: #d4af37; }
+        .cart-btn { background: #d4af37; color: #000; padding: 9px 18px; border-radius: 4px; text-decoration: none; font-weight: bold; transition: 0.2s; }
+        .cart-btn:hover { background: #c5a059; }
+        
+        .container { max-width: 1200px; margin: 40px auto; padding: 0 20px; flex: 1; width: 100%; box-sizing: border-box; }
+        
+        /* Banner de Bienvenida */
+        .hero-banner { background: linear-gradient(135deg, #161616 0%, #0c0c0c 100%); border: 1px solid #d4af37; border-radius: 10px; padding: 35px 30px; text-align: center; margin-bottom: 30px; box-shadow: 0 6px 20px rgba(212, 175, 55, 0.1); }
+        .hero-banner h2 { color: #d4af37; font-size: 2.2rem; margin: 0 0 10px 0; letter-spacing: 1px; }
+        .hero-banner p { color: #bbb; font-size: 1.05rem; max-width: 700px; margin: 0 auto 25px auto; line-height: 1.5; }
+        
+        .features-grid { display: flex; justify-content: center; gap: 30px; flex-wrap: wrap; border-top: 1px solid #2a2a2a; padding-top: 20px; }
+        .feature-item { color: #d4af37; font-size: 0.9rem; font-weight: bold; display: flex; align-items: center; gap: 8px; }
+
+        /* Panel de Controles */
+        .control-panel { background: #161616; border: 1px solid #2a2a2a; padding: 20px; border-radius: 8px; margin-bottom: 35px; display: flex; flex-direction: column; gap: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
+        .search-box input { width: 100%; background: #0c0c0c; color: #fff; border: 1px solid #d4af37; padding: 12px 18px; border-radius: 6px; font-size: 1rem; outline: none; box-sizing: border-box; transition: border-color 0.2s; }
+        .search-box input:focus { border-color: #c5a059; }
+
+        .filters-row { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; border-top: 1px solid #222; padding-top: 15px; }
+        .category-buttons { display: flex; gap: 8px; flex-wrap: wrap; }
+        .cat-btn { background: #0c0c0c; color: #aaa; border: 1px solid #333; padding: 8px 15px; border-radius: 20px; font-weight: bold; font-size: 0.85rem; cursor: pointer; transition: 0.2s; }
+        .cat-btn:hover { border-color: #d4af37; color: #fff; }
+        .cat-btn.active { background: #d4af37; color: #000; border-color: #d4af37; }
+
+        .sort-box { display: flex; align-items: center; gap: 10px; }
+        .sort-box label { color: #d4af37; font-weight: bold; font-size: 0.9rem; }
+        .sort-box select { background: #0c0c0c; color: #fff; border: 1px solid #d4af37; padding: 8px 12px; border-radius: 4px; font-weight: bold; cursor: pointer; outline: none; }
+
+        .section-title { font-size: 1.8rem; color: #d4af37; border-bottom: 2px solid #222; padding-bottom: 10px; margin-top: 40px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
+        .promo-badge { background: #d4af37; color: #000; font-size: 0.85rem; padding: 4px 10px; border-radius: 20px; font-weight: bold; }
+
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 25px; }
+        .card { background: #161616; border: 1px solid #2a2a2a; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.5); display: flex; flex-direction: column; transition: transform 0.2s, border-color 0.2s; cursor: pointer; position: relative; }
+        .card:hover { transform: translateY(-5px); border-color: #d4af37; }
+        
+        .card-img-container { position: relative; width: 100%; height: 200px; background: #222; }
+        .card-img-container img { width: 100%; height: 100%; object-fit: cover; }
+        
+        /* Insignia Flotante */
+        .product-badge { position: absolute; top: 12px; left: 12px; background: #d4af37; color: #000; font-size: 0.75rem; font-weight: bold; padding: 4px 10px; border-radius: 4px; box-shadow: 0 2px 8px rgba(0,0,0,0.5); text-transform: uppercase; z-index: 2; }
+
+        .card-content { padding: 20px; display: flex; flex-direction: column; flex-grow: 1; }
+        .card-title { font-size: 1.25rem; font-weight: bold; margin: 0 0 10px 0; color: #fff; }
+        .card-desc { font-size: 0.9rem; color: #aaa; margin-bottom: 15px; flex-grow: 1; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+        .card-footer { display: flex; flex-direction: column; gap: 10px; margin-top: auto; }
+        .price { font-size: 1.25rem; font-weight: bold; color: #d4af37; }
+        .buttons-row { display: flex; gap: 8px; }
+        .btn-add { flex: 1; background: #262626; color: #d4af37; border: 1px solid #d4af37; padding: 8px 10px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 0.85rem; text-align: center; transition: 0.2s; }
+        .btn-add:hover { background: #d4af37; color: #000; }
+        .btn-buy { flex: 1; background: #d4af37; color: #000; border: none; padding: 8px 10px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 0.85rem; text-decoration: none; text-align: center; display: inline-block; box-sizing: border-box; transition: 0.2s; }
+        .btn-buy:hover { background: #c5a059; }
+        .empty { text-align: center; color: #777; font-size: 1.1rem; padding: 50px; }
+        
+        /* Ventana Modal */
+        #modal-detalle { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 2000; justify-content: center; align-items: center; padding: 20px; box-sizing: border-box; }
+        #modal-detalle.active { display: flex; }
+        .modal-content { background: #161616; border: 2px solid #d4af37; border-radius: 10px; max-width: 800px; width: 100%; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.8); position: relative; animation: fadeIn 0.2s ease-in-out; }
+        @media(min-width: 768px) { .modal-content { flex-direction: row; } }
+        .modal-img-area { flex: 1; background: #000; display: flex; align-items: center; justify-content: center; min-height: 300px; position: relative; }
+        .modal-img-area img { width: 100%; height: 100%; object-fit: cover; max-height: 400px; }
+        .modal-info-area { flex: 1; padding: 30px; display: flex; flex-direction: column; justify-content: space-between; }
+        .modal-close { position: absolute; top: 15px; right: 20px; background: none; border: none; color: #d4af37; font-size: 1.8rem; cursor: pointer; font-weight: bold; z-index: 10; }
+        .modal-title { font-size: 1.8rem; color: #fff; margin: 0 0 15px 0; font-weight: bold; }
+        .modal-cat { color: #d4af37; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; font-weight: bold; }
+        .modal-desc { color: #bbb; font-size: 1rem; line-height: 1.6; margin-bottom: 20px; }
+        .modal-price { font-size: 1.6rem; font-weight: bold; color: #d4af37; margin-bottom: 20px; }
+        .modal-actions { display: flex; gap: 10px; }
+
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+
+        /* Footer */
+        .contact-footer { background: #111; border-top: 2px solid #d4af37; margin-top: 60px; padding: 40px 20px; text-align: center; }
+        .contact-container { max-width: 800px; margin: 0 auto; display: flex; flex-direction: column; gap: 20px; }
+        .contact-footer h3 { color: #d4af37; font-size: 1.5rem; margin: 0; }
+        .contact-footer p { color: #aaa; font-size: 0.95rem; margin: 0; }
+        .contact-links { display: flex; justify-content: center; gap: 20px; flex-wrap: wrap; margin-top: 10px; }
+        .contact-btn { background: #161616; border: 1px solid #d4af37; color: #d4af37; padding: 10px 20px; border-radius: 6px; text-decoration: none; font-weight: bold; font-size: 0.95rem; display: inline-flex; align-items: center; gap: 8px; transition: 0.2s; }
+        .contact-btn:hover { background: #d4af37; color: #000; }
+        .copyright { color: #666; font-size: 0.85rem; margin-top: 20px; border-top: 1px solid #222; padding-top: 15px; }
+
+        #toast { position: fixed; bottom: 20px; right: 20px; background: #d4af37; color: #000; padding: 10px 20px; border-radius: 5px; font-weight: bold; box-shadow: 0 4px 10px rgba(0,0,0,0.5); opacity: 0; transition: opacity 0.3s; pointer-events: none; z-index: 3000; }
+        #toast.show { opacity: 1; }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo-area">
+            <img src="{{ url_for('static', filename='logo.jpg') }}" alt="Ms Store Logo">
+            <h1>Ms Store</h1>
+        </div>
+        <a href="/carrito" class="cart-btn">🛒 Ver Carrito ({{ cantidad_carrito }})</a>
+    </header>
+
+    <div class="container">
+        <!-- Banner de Bienvenida -->
+        <div class="hero-banner">
+            <h2>Bienvenidos a Ms Store</h2>
+            <p>Tu tienda oficial de confianza. Encuentra estilo, exclusividad y la mejor selección de ropa urbana, accesorios y perfumes al mejor precio. ¡Aprovecha nuestras ofertas combinables!</p>
+            <div class="features-grid">
+                <div class="feature-item">🔥 Calidad Exclusiva</div>
+                <div class="feature-item">📦 Ofertas en Packs</div>
+                <div class="feature-item">💳 Compra Fácil y Segura</div>
+            </div>
+        </div>
+
+        <!-- Panel de Controles -->
+        <div class="control-panel">
+            <div class="search-box">
+                <input type="text" id="buscador" placeholder="🔍 Buscar productos por nombre o descripción...">
+            </div>
+            <div class="filters-row">
+                <div class="category-buttons">
+                    <button class="cat-btn active" data-filter="todos">Todos</button>
+                    {% for cat in categorias.keys() %}
+                        <button class="cat-btn" data-filter="{{ cat }}">{{ cat }}</button>
+                    {% endfor %}
+                </div>
+                <div class="sort-box">
+                    <label for="orden-precio">Ordenar:</label>
+                    <select id="orden-precio">
+                        <option value="defecto">Por defecto</option>
+                        <option value="menor-mayor">Precio: Menor a Mayor</option>
+                        <option value="mayor-menor">Precio: Mayor a Menor</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        {% if categorias %}
+            <div id="catalogo-secciones">
+                {% for categoria, prods in categorias.items() %}
+                    <div class="categoria-seccion" data-categoria-nombre="{{ categoria }}">
+                        <div class="section-title">
+                            <span>{{ categoria }}</span>
+                            {% if categoria == 'Poleras' or categoria == 'Cinturones' %}
+                                <span class="promo-badge">🔥 Oferta: 1 x $15.000 | 2 x $25.000</span>
+                            {% endif %}
+                        </div>
+
+                        <div class="grid">
+                            {% for p in prods %}
+                            <div class="card" 
+                                 data-id="{{ p[0] }}"
+                                 data-nombre="{{ p[1] }}" 
+                                 data-precio="{{ p[2] }}" 
+                                 data-descripcion="{{ p[3] if p[3] else 'Sin descripción disponible.' }}" 
+                                 data-imagen="{{ url_for('static', filename='uploads/' + p[4]) if p[4] else 'https://via.placeholder.com/400x400?text=Sin+Imagen' }}"
+                                 data-categoria="{{ categoria }}">
+                                
+                                <div class="card-img-container">
+                                    {% if p[7] %}
+                                        <span class="product-badge">{{ p[7] }}</span>
+                                    {% endif %}
+                                    {% if p[4] %}
+                                        <img src="{{ url_for('static', filename='uploads/' + p[4]) }}" alt="{{ p[1] }}">
+                                    {% else %}
+                                        <img src="https://via.placeholder.com/300x200?text=Sin+Imagen" alt="Sin imagen">
+                                    {% endif %}
+                                </div>
+
+                                <div class="card-content">
+                                    <h3 class="card-title">{{ p[1] }}</h3>
+                                    <p class="card-desc">{{ p[3] if p[3] else 'Sin descripción.' }}</p>
+                                    <div class="card-footer">
+                                        <span class="price">${{ "{:,.0f}".format(p[2]) }}</span>
+                                        <div class="buttons-row" onclick="event.stopPropagation();">
+                                            <form action="/agregar-carrito/{{ p[0] }}" method="POST" class="form-carrito" style="flex: 1; display: flex;">
+                                                <button type="submit" class="btn-add">+ Carrito</button>
+                                            </form>
+                                            <a href="/comprar-directo/{{ p[0] }}" class="btn-buy">Comprar</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="empty">
+                <p>No hay productos disponibles por el momento.</p>
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- VENTANA MODAL -->
+    <div id="modal-detalle">
+        <div class="modal-content">
+            <button class="modal-close" id="cerrar-modal">&times;</button>
+            <div class="modal-img-area">
+                <img id="modal-img" src="" alt="Imagen del producto">
+            </div>
+            <div class="modal-info-area">
+                <div>
+                    <div class="modal-cat" id="modal-cat">Categoría</div>
+                    <h2 class="modal-title" id="modal-titulo">Título del Producto</h2>
+                    <p class="modal-desc" id="modal-desc">Descripción detallada del producto...</p>
+                </div>
+                <div>
+                    <div class="modal-price" id="modal-precio">$0</div>
+                    <div class="modal-actions">
+                        <form id="modal-form-carrito" action="" method="POST" class="form-carrito" style="flex: 1; display: flex;">
+                            <button type="submit" class="btn-add" style="padding: 12px; font-size: 1rem;">+ Agregar al Carrito</button>
+                        </form>
+                        <a id="modal-btn-comprar" href="#" class="btn-buy" style="padding: 12px; font-size: 1rem; flex: 1;">Comprar Ahora</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="contact-footer">
+        <div class="contact-container">
+            <h3>¿Tienes dudas o necesitas ayuda con tu pedido?</h3>
+            <p>Contáctate directamente con nosotros a través de nuestros canales oficiales:</p>
+            
+            <div class="contact-links">
+                <a href="https://wa.me/56955104794" target="_blank" class="contact-btn">
+                    💬 WhatsApp: +56 9 5510 4794
+                </a>
+                <a href="https://instagram.com/ms.store_77" target="_blank" class="contact-btn">
+                    📸 Instagram: @ms.store_77
+                </a>
+                <a href="mailto:matias.79sepulveda@gmail.com" class="contact-btn">
+                    ✉️ Correo: matias.79sepulveda@gmail.com
+                </a>
+            </div>
+
+            <div class="copyright">
+                &copy; 2026 Ms Store - Todos los derechos reservados.
+            </div>
+        </div>
+    </footer>
+
+    <div id="toast">✅ ¡Producto agregado al carrito!</div>
+
+    <script>
+        const buscador = document.getElementById('buscador');
+        const ordenSelect = document.getElementById('orden-precio');
+        const catButtons = document.querySelectorAll('.cat-btn');
+        let categoriaActiva = 'todos';
+
+        function filtrarYOrdenar() {
+            const textoBusqueda = buscador.value.toLowerCase().trim();
+            const criterioOrden = ordenSelect.value;
+
+            document.querySelectorAll('.categoria-seccion').forEach(seccion => {
+                const nombreCatSeccion = seccion.getAttribute('data-categoria-nombre');
+                const cards = Array.from(seccion.querySelectorAll('.card'));
+                let visiblesEnSeccion = 0;
+
+                cards.forEach(card => {
+                    const titulo = card.querySelector('.card-title').textContent.toLowerCase();
+                    const desc = card.querySelector('.card-desc').textContent.toLowerCase();
+
+                    const coincideTexto = titulo.includes(textoBusqueda) || desc.includes(textoBusqueda);
+                    const coincideCategoria = (categoriaActiva === 'todos' || nombreCatSeccion === categoriaActiva);
+
+                    if (coincideTexto && coincideCategoria) {
+                        card.style.display = 'flex';
+                        visiblesEnSeccion++;
+                    } else {
+                        card.style.display = 'none';
+                    }
+                });
+
+                if (visiblesEnSeccion > 0) {
+                    seccion.style.display = 'block';
+                    const grid = seccion.querySelector('.grid');
+                    cards.sort((a, b) => {
+                        const precioA = parseFloat(a.getAttribute('data-precio'));
+                        const precioB = parseFloat(b.getAttribute('data-precio'));
+                        if (criterioOrden === 'mayor-menor') return precioB - precioA;
+                        if (criterioOrden === 'menor-mayor') return precioA - precioB;
+                        return 0;
+                    });
+                    cards.forEach(card => grid.appendChild(card));
+                } else {
+                    seccion.style.display = 'none';
+                }
+            });
+        }
+
+        buscador.addEventListener('input', filtrarYOrdenar);
+        ordenSelect.addEventListener('change', filtrarYOrdenar);
+
+        catButtons.forEach(btn => {
+            btn.addEventListener('click', function() {
+                catButtons.forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                categoriaActiva = this.getAttribute('data-filter');
+                filtrarYOrdenar();
+            });
+        });
+
+        const modal = document.getElementById('modal-detalle');
+        const cerrarModal = document.getElementById('cerrar-modal');
+
+        document.querySelectorAll('.card').forEach(card => {
+            card.addEventListener('click', function() {
+                const id = this.getAttribute('data-id');
+                const nombre = this.getAttribute('data-nombre');
+                const precio = parseFloat(this.getAttribute('data-precio'));
+                const descripcion = this.getAttribute('data-descripcion');
+                const imagen = this.getAttribute('data-imagen');
+                const categoria = this.getAttribute('data-categoria');
+
+                document.getElementById('modal-img').src = imagen;
+                document.getElementById('modal-cat').textContent = categoria;
+                document.getElementById('modal-titulo').textContent = nombre;
+                document.getElementById('modal-desc').textContent = descripcion;
+                document.getElementById('modal-precio').textContent = '$' + precio.toLocaleString('es-CL');
+                
+                document.getElementById('modal-form-carrito').action = `/agregar-carrito/${id}`;
+                document.getElementById('modal-btn-comprar').href = `/comprar-directo/${id}`;
+
+                modal.classList.add('active');
+            });
+        });
+
+        cerrarModal.addEventListener('click', () => {
+            modal.classList.remove('active');
+        });
+
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                modal.classList.remove('active');
+            }
+        });
+
+        document.addEventListener('submit', function(e) {
+            if (e.target && e.target.classList.contains('form-carrito')) {
+                e.preventDefault();
+                const url = e.target.action;
+                fetch(url, { method: 'POST', headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        document.querySelector('.cart-btn').textContent = `🛒 Ver Carrito (${data.cantidad_carrito})`;
+                        const toast = document.getElementById('toast');
+                        toast.classList.add('show');
+                        setTimeout(() => { toast.classList.remove('show'); }, 2000);
+                        modal.classList.remove('active');
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+            }
+        });
+    </script>
+</body>
+</html> 
